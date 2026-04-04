@@ -27,6 +27,7 @@ classifiers = [
 keywords = ["openenv", "email", "triage", "ai", "environment", "nlp", "classification"]
 
 dependencies = [
+    "openenv-core>=0.2.0",
     "fastapi>=0.115.6,<1",
     "uvicorn[standard]>=0.32.0,<1",
     "pydantic>=2.10.4,<3",
@@ -53,7 +54,8 @@ Documentation = "https://huggingface.co/spaces/Swatimishra/open-env"
 "Bug Tracker" = "https://github.com/Swatimishra8/openenv-project/issues"
 
 [project.scripts]
-openenv-email-triage = "app:main"
+openenv-email-triage-server = "server.app:main"
+openenv-email-triage = "app:app"
 
 [tool.setuptools]
 packages = ["env"]
