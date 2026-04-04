@@ -94,6 +94,25 @@ class StepRequest(BaseModel):
 
 # ── Routes ────────────────────────────────────────────────────────────────────
 
+@app.get("/")
+async def root() -> Dict[str, Any]:
+    """Root endpoint - provides API information and available endpoints."""
+    return {
+        "message": "OpenEnv Email Triage Environment",
+        "version": "1.0.0",
+        "description": "Real-world email triage environment for AI agent training",
+        "endpoints": {
+            "health": "/health",
+            "tasks": "/tasks", 
+            "reset": "POST /reset",
+            "step": "POST /step",
+            "state": "/state",
+            "docs": "/docs"
+        },
+        "openenv_compliant": True
+    }
+
+
 @app.get("/health")
 async def health_check() -> Dict[str, Any]:
     """Health check — returns 200 if the server is running."""
@@ -120,11 +139,17 @@ async def get_task(task_id: str) -> TaskDefinition:
 
 
 @app.post("/reset", response_model=ResetResult)
-async def reset_environment(request: ResetRequest) -> ResetResult:
+async def reset_environment(request: Optional[ResetRequest] = None) -> ResetResult:
     """
     Reset the environment for a given task_id and return the first observation.
     Call this before starting a new episode.
+    
+    The request body is optional - if not provided, defaults will be used.
     """
+    # Handle empty POST requests (for automated checkers)
+    if request is None:
+        request = ResetRequest()
+    
     print(f"[App] POST /reset — task_id={request.task_id}")
     env = get_env(request.task_id)
     if request.seed is not None:
@@ -137,6 +162,8 @@ async def step_environment(request: StepRequest) -> StepResult:
     """
     Submit an action and receive next observation, reward, done flag, and info.
     The episode ends when done=True (action_type='done' or max_steps reached).
+    
+    Requires a valid action in the request body.
     """
     print(f"[App] POST /step — task_id={request.task_id}, action_type={request.action.action_type}")
     env = get_env(request.task_id)
@@ -144,6 +171,9 @@ async def step_environment(request: StepRequest) -> StepResult:
         return env.step(request.action)
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        print(f"[App] Unexpected error in /step: {exc}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(exc)}")
 
 
 @app.get("/state", response_model=StateResult)
