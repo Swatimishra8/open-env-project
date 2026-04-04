@@ -54,6 +54,9 @@ Documentation = "https://huggingface.co/spaces/Swatimishra/open-env"
 "Bug Tracker" = "https://github.com/Swatimishra8/openenv-project/issues"
 
 [project.scripts]
+serve = "server.app:main"
+start-server = "server.app:main"
+server = "server.app:main"
 openenv-email-triage-server = "server.app:main"
 openenv-email-triage = "app:app"
 
@@ -69,6 +72,7 @@ env = ["*.json", "*.yaml", "*.yml"]
 name = "email-triage-env"
 version = "1.0.0"
 entry_point = "app:app"
+server_entry_point = "server.app:main"
 server_command = "uvicorn app:app --host 0.0.0.0 --port 7860"
 
 [openenv.environment]
@@ -81,6 +85,11 @@ multi_mode = true
 supports_docker = true
 supports_python = true
 min_python_version = "3.11"
+
+[openenv.server]
+entry_point = "server.app:main"
+script_name = "serve"
+command = "uvicorn app:app --host 0.0.0.0 --port 7860"
 
 [openenv.api]
 reset_endpoint = "/reset"
