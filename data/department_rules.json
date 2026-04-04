@@ -1,0 +1,85 @@
+{
+  "departments": {
+    "sales": {
+      "description": "Handles new business, pricing, quotes, bulk orders, enterprise deals",
+      "handles": ["inquiry", "order", "feedback"],
+      "email_keywords": ["pricing", "quote", "purchase", "bulk", "enterprise", "license", "buy", "discount", "proposal"],
+      "escalation_threshold": "deals over $50,000"
+    },
+    "support": {
+      "description": "Technical help, product issues, how-to questions, account access",
+      "handles": ["support", "complaint"],
+      "email_keywords": ["cannot", "error", "broken", "help", "how do i", "not working", "crash", "login", "password", "issue", "problem"],
+      "escalation_threshold": "data loss, service outages, security incidents"
+    },
+    "billing": {
+      "description": "Invoice questions, payment processing, subscription changes, refunds",
+      "handles": ["billing", "complaint"],
+      "email_keywords": ["invoice", "payment", "refund", "charge", "overcharged", "billing", "subscription", "cancel", "account", "plan"],
+      "escalation_threshold": "disputes over $1,000, legal threats"
+    },
+    "technical": {
+      "description": "Complex technical issues, integrations, API, bugs, development queries",
+      "handles": ["support", "inquiry"],
+      "email_keywords": ["api", "integration", "bug", "developer", "sdk", "webhook", "technical", "crash log", "error code"],
+      "escalation_threshold": "P1 production outages, security vulnerabilities"
+    },
+    "management": {
+      "description": "Escalated complaints, executive contacts, partnership inquiries",
+      "handles": ["complaint", "inquiry"],
+      "email_keywords": ["manager", "supervisor", "escalate", "legal", "lawsuit", "unacceptable", "worst", "disgusting"],
+      "escalation_threshold": "all escalations"
+    },
+    "hr": {
+      "description": "Employment, recruitment, employee relations",
+      "handles": [],
+      "email_keywords": ["job", "position", "career", "resume", "employment", "hiring", "internship"],
+      "escalation_threshold": "none"
+    },
+    "legal": {
+      "description": "Legal threats, compliance, contracts, IP issues",
+      "handles": [],
+      "email_keywords": ["legal", "lawsuit", "attorney", "lawyer", "sue", "court", "infringement", "violation", "contract"],
+      "escalation_threshold": "all"
+    }
+  },
+  "priority_rules": {
+    "urgent": {
+      "conditions": [
+        "explicit deadline within 24 hours",
+        "data loss",
+        "security incident",
+        "legal threat",
+        "system outage affecting business",
+        "VIP/enterprise customer issue",
+        "words: immediately, urgent, asap, emergency, critical"
+      ]
+    },
+    "high": {
+      "conditions": [
+        "deadline within 1 week",
+        "business-impacting issue",
+        "multiple contacts without resolution",
+        "damaged or missing order",
+        "billing overcharge",
+        "words: important, soon, as soon as possible"
+      ]
+    },
+    "normal": {
+      "conditions": [
+        "standard inquiry or support",
+        "general questions",
+        "no explicit deadline",
+        "first contact"
+      ]
+    },
+    "low": {
+      "conditions": [
+        "feedback or suggestions",
+        "nice-to-have requests",
+        "informational only",
+        "no action required"
+      ]
+    }
+  }
+}

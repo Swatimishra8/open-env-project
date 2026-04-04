@@ -1,0 +1,14 @@
+# OpenEnv Email Triage — runtime only (no torch/transformers; unused in this project).
+# Works on Python 3.11, 3.12, 3.13, and 3.14+.
+
+fastapi>=0.115.6,<1
+uvicorn[standard]>=0.32.0,<1
+pydantic>=2.10.4,<3
+pydantic-settings>=2.6.0,<3
+openai>=1.68.0
+huggingface_hub>=0.20.0,<1
+httpx>=0.28.0,<1
+python-dotenv>=1.0.1,<2
+pyyaml>=6.0.1,<7
+rich>=13.9.0,<15
+typer>=0.15.0,<1

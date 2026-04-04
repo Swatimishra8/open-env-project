@@ -1,0 +1,144 @@
+name: email-triage-env
+version: "1.0.0"
+description: >
+  A real-world email triage environment where AI agents learn to classify,
+  prioritize, route, and respond to emails. Simulates a corporate inbox with
+  three progressive tasks of increasing difficulty.
+author: OpenEnv Email Triage Team
+tags:
+  - openenv
+  - email
+  - triage
+  - nlp
+  - classification
+  - real-world
+
+environment:
+  type: text
+  language: python
+  framework: fastapi
+
+observation_space:
+  type: object
+  description: Current email content with context and history
+  fields:
+    email_id:
+      type: string
+      description: Unique identifier for the email
+    sender:
+      type: string
+      description: Email sender address
+    subject:
+      type: string
+      description: Email subject line
+    body:
+      type: string
+      description: Full email body text
+    timestamp:
+      type: string
+      format: datetime
+      description: When the email was received
+    attachments:
+      type: array
+      items: string
+      description: List of attachment filenames
+    previous_actions:
+      type: array
+      items: string
+      description: Actions taken so far on this email
+    department_context:
+      type: object
+      description: Available department routing options
+    urgency_indicators:
+      type: array
+      items: string
+      description: Keywords or signals indicating urgency
+    task_id:
+      type: string
+      description: Current task identifier
+    step_number:
+      type: integer
+      description: Current step in the episode
+    max_steps:
+      type: integer
+      description: Maximum allowed steps per episode
+
+action_space:
+  type: object
+  description: Action to take on the current email
+  fields:
+    action_type:
+      type: string
+      enum: [classify, prioritize, route, reply, escalate, done]
+      description: Type of action to perform
+    classification:
+      type: string
+      enum: [spam, inquiry, complaint, order, support, feedback, billing]
+      optional: true
+      description: Email category classification
+    priority:
+      type: string
+      enum: [urgent, high, normal, low]
+      optional: true
+      description: Priority level assignment
+    department:
+      type: string
+      enum: [sales, support, billing, technical, management, hr, legal]
+      optional: true
+      description: Department to route the email to
+    reply_text:
+      type: string
+      optional: true
+      description: Response text to send
+    escalation_reason:
+      type: string
+      optional: true
+      description: Reason for escalation
+
+tasks:
+  - id: task_classify
+    name: Basic Email Classification
+    difficulty: easy
+    description: >
+      Classify incoming emails into one of 5 categories: spam, inquiry,
+      complaint, order, or support. Each email is clearly distinguishable.
+    max_steps: 3
+    target_score: 0.8
+
+  - id: task_priority_routing
+    name: Priority Assignment and Routing
+    difficulty: medium
+    description: >
+      Classify emails AND assign priority level (urgent/high/normal/low)
+      AND route to the correct department. Emails have mixed complexity.
+    max_steps: 5
+    target_score: 0.7
+
+  - id: task_full_triage
+    name: Full Triage with Response Generation
+    difficulty: hard
+    description: >
+      Complete full email triage: classify, prioritize, route, and generate
+      an appropriate response or escalation. Requires nuanced understanding
+      of email content and organizational context.
+    max_steps: 8
+    target_score: 0.6
+
+api:
+  base_path: /
+  endpoints:
+    - path: /reset
+      method: POST
+      description: Reset environment and return initial observation
+    - path: /step
+      method: POST
+      description: Take an action and return next observation, reward, done, info
+    - path: /state
+      method: GET
+      description: Get current environment state
+    - path: /health
+      method: GET
+      description: Health check endpoint
+    - path: /tasks
+      method: GET
+      description: List all available tasks

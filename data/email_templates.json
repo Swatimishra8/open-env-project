@@ -1,0 +1,163 @@
+{
+  "spam": [
+    {
+      "subject": "CONGRATULATIONS! You've won $1,000,000!!!",
+      "body": "Dear lucky winner,\n\nYou have been selected as the grand prize winner of our international lottery! Click here to claim your prize immediately. Reply with your bank details to process the transfer.\n\nBest regards,\nLottery Team",
+      "sender": "lottery.winner@prize-international.xyz",
+      "urgency_indicators": [],
+      "attachments": []
+    },
+    {
+      "subject": "Limited time offer - Buy 2 get 10 FREE!!!",
+      "body": "AMAZING DEAL JUST FOR YOU!\n\nFor the next 24 hours only, you can buy 2 of our premium supplements and get 10 FREE! This offer expires soon!\n\nClick here: http://bit.ly/amazing-deal-now\n\nUnsubscribe: http://spam-list.xyz/remove",
+      "sender": "deals@super-health-xyz.net",
+      "urgency_indicators": ["limited time", "expires soon"],
+      "attachments": []
+    },
+    {
+      "subject": "Your account has been suspended - Verify NOW",
+      "body": "Dear Valued Customer,\n\nYour account has been temporarily suspended due to suspicious activity. Please verify your identity immediately by clicking the link below and entering your password.\n\nVerify Now: http://secure-verify.phishing.com/login\n\nIf you do not verify within 24 hours, your account will be permanently deleted.",
+      "sender": "security@paypa1-verify.com",
+      "urgency_indicators": ["immediately", "24 hours", "permanently deleted"],
+      "attachments": []
+    },
+    {
+      "subject": "Work from home and earn $5000/week!",
+      "body": "Hi there,\n\nAre you tired of your 9-to-5 job? Our proven system lets you work from home and earn $5000 per week with just 2 hours of work daily!\n\nNo experience needed. Click here to start today!\n\nhttp://work-from-home-scam.xyz",
+      "sender": "opportunity@make-money-fast.biz",
+      "urgency_indicators": [],
+      "attachments": []
+    }
+  ],
+  "inquiry": [
+    {
+      "subject": "Question about your product pricing",
+      "body": "Hello,\n\nI came across your company's website and I'm interested in learning more about your enterprise software solutions. Could you please send me a pricing sheet for the professional tier?\n\nI'm also wondering if you offer volume discounts for teams larger than 50 people.\n\nThank you for your time,\n{sender_name}",
+      "sender": "{first}.{last}@{company}.com",
+      "urgency_indicators": [],
+      "attachments": []
+    },
+    {
+      "subject": "Inquiry: Integration with Salesforce",
+      "body": "Hi there,\n\nI'm evaluating your platform for our team of 30 sales reps. Before we proceed, I need to know:\n\n1. Does your product integrate natively with Salesforce?\n2. What is the typical implementation timeline?\n3. Do you provide dedicated onboarding support?\n\nWe're planning to make a decision by end of quarter.\n\nThanks,\n{sender_name}\n{title} at {company}",
+      "sender": "{first}.{last}@{company}.com",
+      "urgency_indicators": [],
+      "attachments": []
+    },
+    {
+      "subject": "Question about your return policy",
+      "body": "To Whom It May Concern,\n\nI recently purchased order #ORD-{order_id} and would like to understand your return policy before deciding whether to keep the item.\n\nSpecifically, I have questions about:\n- The 30-day return window\n- Whether I need the original packaging\n- How refunds are processed\n\nPlease let me know at your earliest convenience.\n\nBest,\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": [],
+      "attachments": []
+    },
+    {
+      "subject": "Availability of {product_name}",
+      "body": "Hello,\n\nI'm interested in purchasing {product_name} but I noticed it shows as 'out of stock' on your website. Do you know when it will be back in stock?\n\nAlternatively, is there a similar product you would recommend?\n\nThank you,\n{sender_name}",
+      "sender": "{first}_{last}@{email_domain}",
+      "urgency_indicators": [],
+      "attachments": []
+    }
+  ],
+  "complaint": [
+    {
+      "subject": "Unacceptable service - Order #{order_id} still not received",
+      "body": "To the Customer Service Team,\n\nI placed order #{order_id} over THREE WEEKS AGO and it has still not arrived. I have contacted your support team twice already and received nothing but automated responses.\n\nThis is completely unacceptable. I need this issue resolved IMMEDIATELY or I will be forced to dispute the charge with my credit card company and leave a negative review.\n\nExpected delivery was {expected_date}. Today is {today_date}.\n\nI demand a response within 24 hours.\n\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": ["IMMEDIATELY", "unacceptable", "dispute", "24 hours", "negative review"],
+      "attachments": []
+    },
+    {
+      "subject": "Product arrived damaged",
+      "body": "Hello,\n\nI received my order today but the product was completely damaged. The packaging was crushed and the item inside is broken.\n\nOrder details:\n- Order ID: #{order_id}\n- Item: {product_name}\n- Date ordered: {order_date}\n\nI have attached photos of the damage. This is very disappointing as this was a gift for my {occasion}. Please advise on how to proceed with a replacement or refund.\n\nSincerely,\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": ["damaged", "broken", "replacement", "refund"],
+      "attachments": ["damage_photo_1.jpg", "damage_photo_2.jpg"]
+    },
+    {
+      "subject": "Billing error on my account",
+      "body": "I am writing to report a billing error on my account.\n\nI was charged ${wrong_amount} on {charge_date} for my monthly subscription, but my plan is only ${correct_amount}/month.\n\nAccount email: {account_email}\nAccount ID: ACC-{account_id}\n\nThis is the third time this has happened. I need this corrected immediately and a refund issued for the overcharge. If this continues, I will cancel my subscription.\n\nFrustrated,\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": ["billing error", "overcharge", "refund", "cancel"],
+      "attachments": []
+    }
+  ],
+  "order": [
+    {
+      "subject": "Order confirmation needed - Enterprise License",
+      "body": "Hi,\n\nPlease find attached our purchase order for 50 enterprise licenses (PO #{po_number}).\n\nItems:\n- Enterprise License x50: ${price_per} each\n- Total: ${total_price}\n- Delivery: Digital download\n\nBilling address: {company_name}, {address}\n\nPlease confirm receipt and provide invoice.\n\nThank you,\n{sender_name}\nProcurement Manager, {company}",
+      "sender": "procurement@{company}.com",
+      "urgency_indicators": [],
+      "attachments": ["PO_{po_number}.pdf"]
+    },
+    {
+      "subject": "Request to modify existing order #{order_id}",
+      "body": "Hello,\n\nI placed order #{order_id} yesterday and realized I need to make a change before it ships.\n\nCurrent order: {current_item} x{current_qty}\nRequested change: {new_item} x{new_qty}\n\nIs it possible to modify this before it goes out? Please let me know as soon as possible as I assume it may ship soon.\n\nThanks,\n{sender_name}",
+      "sender": "{first}@{email_domain}",
+      "urgency_indicators": ["before it ships", "as soon as possible"],
+      "attachments": []
+    },
+    {
+      "subject": "Bulk order inquiry - Q4 stock",
+      "body": "Dear Sales Team,\n\nWe are preparing our Q4 inventory and would like to place a bulk order for the following:\n\n- {product_1}: 200 units\n- {product_2}: 150 units\n- {product_3}: 100 units\n\nCould you please provide:\n1. Bulk pricing for quantities listed\n2. Estimated lead time\n3. Available shipping options\n\nWe need delivery by {deadline_date} to meet our holiday season requirements.\n\nBest,\n{sender_name}\n{title}, {company}",
+      "sender": "orders@{company}.com",
+      "urgency_indicators": ["deadline", "holiday season"],
+      "attachments": []
+    }
+  ],
+  "support": [
+    {
+      "subject": "Cannot log into my account",
+      "body": "Hi Support,\n\nI've been trying to log into my account for the past hour and keep getting an error message: 'Invalid credentials'.\n\nI've already tried:\n1. Resetting my password (link from reset email doesn't work)\n2. Clearing browser cache\n3. Trying a different browser\n\nMy account email is {account_email}\n\nI have a meeting in 2 hours where I need to access my data. Please help urgently.\n\nThank you,\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": ["cannot log in", "urgently", "meeting in 2 hours"],
+      "attachments": []
+    },
+    {
+      "subject": "Software crash - data loss concern",
+      "body": "Hello,\n\nYour software crashed while I was working on an important project. When I restarted it, some of my work appears to be missing.\n\nDetails:\n- Software version: {version}\n- OS: {os_name}\n- Last autosave: {last_save}\n- Missing data: approximately {missing_amount} of work\n\nI have the crash log attached. This is critical as I have a client deadline tomorrow.\n\nPlease help recover my data as soon as possible.\n\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": ["crash", "data loss", "critical", "deadline tomorrow"],
+      "attachments": ["crash_log.txt"]
+    },
+    {
+      "subject": "How do I export my data?",
+      "body": "Hello,\n\nI've been using your service for about 6 months and I want to export all my data to do an analysis in Excel.\n\nI looked through the settings menu and the help docs but couldn't figure out how to do a full data export.\n\nCould you please walk me through the steps?\n\nThanks,\n{sender_name}",
+      "sender": "{first}_{last}@{email_domain}",
+      "urgency_indicators": [],
+      "attachments": []
+    }
+  ],
+  "feedback": [
+    {
+      "subject": "Feedback on recent update",
+      "body": "Hi Team,\n\nI wanted to share some feedback on the recent v{version} update.\n\nPositives:\n- The new dashboard is much cleaner\n- Performance seems improved\n- Love the new export feature\n\nAreas for improvement:\n- The keyboard shortcut for undo changed and it's confusing\n- The mobile version seems slower than before\n- Would love dark mode\n\nOverall, great update! Keep up the good work.\n\nBest,\n{sender_name}",
+      "sender": "{first}.{last}@{email_domain}",
+      "urgency_indicators": [],
+      "attachments": []
+    },
+    {
+      "subject": "Feature request: API access",
+      "body": "Hello,\n\nI'm a long-time customer ({years} years) and power user. I'd like to formally request API access for your platform.\n\nUse case: I want to automatically sync data from your platform to our internal BI tools.\n\nI'd be happy to join a beta program if you're developing this feature.\n\nThank you for considering,\n{sender_name}\n{title}",
+      "sender": "{first}.{last}@{company}.com",
+      "urgency_indicators": [],
+      "attachments": []
+    }
+  ],
+  "billing": [
+    {
+      "subject": "Invoice #{invoice_id} - Payment Question",
+      "body": "Dear Billing Team,\n\nI received invoice #{invoice_id} dated {invoice_date} for ${amount}.\n\nI have a few questions:\n1. The line item '{item_name}' - what does this cover?\n2. Is early payment discount available?\n3. Can you accept payment via ACH transfer?\n\nOur payment terms are Net-30 but we'd like to pay sooner if there's a discount.\n\nThank you,\n{sender_name}\nAccounts Payable, {company}",
+      "sender": "ap@{company}.com",
+      "urgency_indicators": [],
+      "attachments": []
+    },
+    {
+      "subject": "Urgent: Subscription cancellation request",
+      "body": "Hello,\n\nI am writing to formally request the cancellation of my subscription (Account: {account_id}) effective immediately.\n\nReasons for cancellation:\n- Cost is too high for our current budget\n- We are switching to a different provider\n\nPlease confirm:\n1. When the subscription will end\n2. Whether we will receive a prorated refund\n3. How to export our data before access is removed\n\nKindly process this as soon as possible.\n\n{sender_name}",
+      "sender": "{first}.{last}@{company}.com",
+      "urgency_indicators": ["urgent", "immediately", "as soon as possible"],
+      "attachments": []
+    }
+  ]
+}
