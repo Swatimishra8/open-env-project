@@ -192,6 +192,10 @@ def parse_action(response_text: str) -> Optional[dict]:
 # ── Logging helpers ──────────────────────────────────────────────────────────
 
 def log_start(task: str, model: str) -> None:
+    # Required structured output for validator
+    print(f"[START] task={task}", flush=True)
+    
+    # Additional logging for debugging
     print(f"\n{'='*60}")
     print(f"  Task:  {task}")
     print(f"  Model: {model}")
@@ -200,12 +204,20 @@ def log_start(task: str, model: str) -> None:
 
 
 def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str] = None) -> None:
+    # Required structured output for validator
+    print(f"[STEP] step={step} reward={reward}", flush=True)
+    
+    # Additional logging for debugging
     status = "DONE" if done else f"reward={reward:+.3f}"
     error_str = f" [ERROR: {error}]" if error else ""
     print(f"  Step {step:2d} | {action:<50} | {status}{error_str}")
 
 
-def log_end(success: bool, steps: int, rewards: List[float], final_score: float) -> None:
+def log_end(success: bool, steps: int, rewards: List[float], final_score: float, task: str = "") -> None:
+    # Required structured output for validator
+    print(f"[END] task={task} score={final_score} steps={steps}", flush=True)
+    
+    # Additional logging for debugging
     avg = sum(rewards) / len(rewards) if rewards else 0.0
     print(f"\n  Result: {'SUCCESS' if success else 'FAILED'}")
     print(f"  Steps:  {steps}")
@@ -242,7 +254,7 @@ def run_task(
 ) -> Dict[str, Any]:
     """Run the agent on `emails_count` emails for a given task. Returns aggregate scores."""
 
-    print(f"\n[Inference] Starting task={task_id} for {emails_count} emails")
+    print(f"\n[Inference] Starting task={task_id} for {emails_count} emails", flush=True)
     all_scores: List[float] = []
     success_count = 0
 
@@ -411,10 +423,10 @@ def run_task(
         if success:
             success_count += 1
 
-        log_end(success=success, steps=steps_taken, rewards=rewards, final_score=final_score)
+        log_end(success=success, steps=steps_taken, rewards=rewards, final_score=final_score, task=task_id)
 
     avg_score = sum(all_scores) / len(all_scores) if all_scores else 0.0
-    print(f"[Inference] Task {task_id} complete — avg_score={avg_score:.3f}, success_rate={success_count}/{emails_count}")
+    print(f"[Inference] Task {task_id} complete — avg_score={avg_score:.3f}, success_rate={success_count}/{emails_count}", flush=True)
 
     return {
         "task_id": task_id,
