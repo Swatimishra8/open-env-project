@@ -36,41 +36,28 @@ _envs: Dict[str, EmailTriageEnv] = {}
 
 
 def get_env(task_id: str = "task_classify") -> EmailTriageEnv:
+    """Lazy loading: create environment only when first requested."""
     if task_id not in ALL_TASKS:
         raise HTTPException(
             status_code=400,
             detail=f"Unknown task_id={task_id!r}. Valid: {sorted(ALL_TASKS.keys())}",
         )
+    
     if task_id not in _envs:
+        print(f"[App] Creating env for {task_id} (lazy loading)")
         seed = int(os.getenv("ENV_SEED", "42"))
-        print(f"[App] Creating new env for task_id={task_id}")
         _envs[task_id] = EmailTriageEnv(task_id=task_id, seed=seed)
+        print(f"[App] Environment {task_id} ready")
+    
     return _envs[task_id]
 
 
-# ── Background warmup (non-blocking) ──────────────────────────────────────────
-
-def warmup_environments():
-    """Pre-warm environments in background thread (non-blocking)."""
-    import time
-    time.sleep(2)  # Let the app start first
-    print("[App] Background warmup starting...")
-    try:
-        for task_id in ALL_TASKS:
-            print(f"[App] Warming up {task_id}...")
-            env = get_env(task_id)
-            env.reset()
-        print("[App] Background warmup complete.")
-    except Exception as exc:
-        print(f"[App] Background warmup failed: {exc}")
-
+# ── Simple lifespan (no pre-warming) ──────────────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("[App] Lifespan startup — starting background warmup...")
-    import threading
-    threading.Thread(target=warmup_environments, daemon=True).start()
-    print("[App] App ready (warmup running in background).")
+    print("[App] Lifespan startup — using lazy loading (no pre-warming)")
+    print("[App] Environments will be created on first use")
     yield
     print("[App] Lifespan shutdown.")
 
@@ -196,6 +183,27 @@ async def get_state(task_id: str = Query(default="task_classify")) -> StateResul
     print(f"[App] GET /state — task_id={task_id}")
     env = get_env(task_id)
     return env.state()
+
+
+@app.get("/run-task/{task_id}")
+async def run_task_test(task_id: str) -> Dict[str, Any]:
+    """Test endpoint to verify lazy loading works."""
+    print(f"[App] GET /run-task/{task_id} — testing lazy loading")
+    try:
+        env = get_env(task_id)
+        return {
+            "status": "env ready",
+            "task_id": task_id,
+            "env_created": True,
+            "message": f"Environment for {task_id} is ready"
+        }
+    except Exception as exc:
+        return {
+            "status": "error",
+            "task_id": task_id,
+            "env_created": False,
+            "error": str(exc)
+        }
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
