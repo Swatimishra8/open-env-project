@@ -1,28 +1,41 @@
 # ── Build stage ──────────────────────────────────────────────────────────────
-FROM python:3.11-slim AS base
+# Use a more stable base image with explicit tag
+FROM python:3.11.10-slim-bookworm
 
-# System deps
+# Set environment variables for better Python behavior in containers
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# System deps with retry logic for robustness
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Set working directory
 WORKDIR /app
 
-# Copy dependency manifest first for layer caching
+# Copy dependency files first for better layer caching
 COPY requirements.txt .
+COPY pyproject.toml .
 
-# Install Python dependencies (same set as local venv; no torch)
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies with retry and timeout
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir --timeout 120 --retries 5 --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 # Copy application code
 COPY env/ ./env/
 COPY data/ ./data/
+COPY server/ ./server/
 COPY app.py .
+COPY config.py .
 COPY openenv.yaml .
 COPY inference.py .
+COPY __init__.py .
 COPY README.md .
 
 # ── Runtime ───────────────────────────────────────────────────────────────────
