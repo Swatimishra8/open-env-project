@@ -48,15 +48,29 @@ def get_env(task_id: str = "task_classify") -> EmailTriageEnv:
     return _envs[task_id]
 
 
-# ── Lifespan (pre-warm all envs at startup) ───────────────────────────────────
+# ── Background warmup (non-blocking) ──────────────────────────────────────────
+
+def warmup_environments():
+    """Pre-warm environments in background thread (non-blocking)."""
+    import time
+    time.sleep(2)  # Let the app start first
+    print("[App] Background warmup starting...")
+    try:
+        for task_id in ALL_TASKS:
+            print(f"[App] Warming up {task_id}...")
+            env = get_env(task_id)
+            env.reset()
+        print("[App] Background warmup complete.")
+    except Exception as exc:
+        print(f"[App] Background warmup failed: {exc}")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("[App] Lifespan startup — pre-warming environments...")
-    for task_id in ALL_TASKS:
-        env = get_env(task_id)
-        env.reset()
-    print("[App] All environments ready.")
+    print("[App] Lifespan startup — starting background warmup...")
+    import threading
+    threading.Thread(target=warmup_environments, daemon=True).start()
+    print("[App] App ready (warmup running in background).")
     yield
     print("[App] Lifespan shutdown.")
 

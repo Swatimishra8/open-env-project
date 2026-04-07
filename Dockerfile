@@ -34,9 +34,7 @@ USER appuser
 # HF Spaces uses port 7860
 EXPOSE 7860
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:7860/health || exit 1
+# Health check removed - can interfere with HF Spaces startup detection
 
 # Start FastAPI server
 CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860", "--workers", "1"]
