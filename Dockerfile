@@ -1,12 +1,7 @@
-# ── OpenEnv Email Triage Environment ─────────────────────────────────────────
-FROM python:3.11-slim
+# ── Build stage ──────────────────────────────────────────────────────────────
+FROM python:3.11-slim AS base
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
-
-# Install system dependencies
+# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -15,8 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set working directory
 WORKDIR /app
 
-# Copy and install Python dependencies
+# Copy dependency manifest first for layer caching
 COPY requirements.txt .
+
+# Install Python dependencies (same set as local venv; no torch)
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -26,19 +23,20 @@ COPY data/ ./data/
 COPY app.py .
 COPY openenv.yaml .
 COPY inference.py .
-COPY config.py .
-COPY openenv_validate.py .
-COPY openenv .
+COPY README.md .
 
-# Make openenv command available in PATH
-RUN chmod +x openenv && ln -s /app/openenv /usr/local/bin/openenv
+# ── Runtime ───────────────────────────────────────────────────────────────────
 
-# Create non-root user for HF Spaces
+# HF Spaces runs as non-root user 1000
 RUN useradd -m -u 1000 appuser && chown -R appuser /app
 USER appuser
 
-# Expose port
+# HF Spaces uses port 7860
 EXPOSE 7860
 
-# Start the server
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:7860/health || exit 1
+
+# Start FastAPI server
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860", "--workers", "1"]

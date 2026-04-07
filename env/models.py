@@ -110,11 +110,11 @@ class EmailAction(BaseModel):
 class EmailReward(BaseModel):
     """Decomposed reward signal returned after each action."""
 
-    total_score: float = Field(..., ge=-1.0, le=1.0, description="Overall reward (-1.0–1.0)")
-    classification_score: float = Field(default=0.0, ge=-1.0, le=1.0)
-    priority_score: float = Field(default=0.0, ge=-1.0, le=1.0)
-    routing_score: float = Field(default=0.0, ge=-1.0, le=1.0)
-    response_quality_score: float = Field(default=0.0, ge=-1.0, le=1.0)
+    total_score: float = Field(..., ge=0.0, le=1.0, description="Overall reward (0.0–1.0)")
+    classification_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    priority_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    routing_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    response_quality_score: float = Field(default=0.0, ge=0.0, le=1.0)
     efficiency_bonus: float = Field(default=0.0, ge=0.0, le=0.2)
     penalty: float = Field(default=0.0, ge=0.0, le=1.0, description="Penalty for harmful actions")
     feedback: str = Field(default="", description="Human-readable reward explanation")
