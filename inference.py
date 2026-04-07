@@ -24,27 +24,50 @@ import time
 from typing import Any, Dict, List, Optional
 
 import httpx
-from config import USE_OPENAI, USE_HF, OPENAI_API_KEY, HF_TOKEN, API_BASE_URL, MODEL_NAME, ENV_BASE_URL
 from env.models import EmailAction
 
-# Initialize the appropriate client based on config
-DEMO_MODE = OPENAI_API_KEY == "demo-mode"
+# ── LLM Client Configuration ─────────────────────────────────────────────────────
+# Priority: Use validator-provided environment variables first, then fallback to config
 
-if DEMO_MODE:
-    client = None  # Mock client
-    print(f"[Inference] Using DEMO MODE with model: {MODEL_NAME}")
-    print("[Inference] ⚠️  This will simulate realistic agent responses for demonstration")
-elif USE_OPENAI:
+# Check for validator-provided environment variables
+VALIDATOR_API_KEY = os.getenv("API_KEY")  # Provided by validator
+VALIDATOR_API_BASE_URL = os.getenv("API_BASE_URL")  # Provided by validator
+
+if VALIDATOR_API_KEY and VALIDATOR_API_BASE_URL:
+    # Use validator's LiteLLM proxy
     from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY, base_url=API_BASE_URL)
-    print(f"[Inference] Using OpenAI client with model: {MODEL_NAME}")
-elif USE_HF:
-    from huggingface_hub import InferenceClient
-    client = InferenceClient(token=HF_TOKEN)
-    print(f"[Inference] Using Hugging Face client with model: {MODEL_NAME}")
+    client = OpenAI(api_key=VALIDATOR_API_KEY, base_url=VALIDATOR_API_BASE_URL)
+    MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")  # Use validator's model or default
+    API_BASE_URL = VALIDATOR_API_BASE_URL
+    print(f"[Inference] ✅ Using VALIDATOR LiteLLM proxy", flush=True)
+    print(f"[Inference] ✅ Validator API_KEY found: {VALIDATOR_API_KEY[:10]}...", flush=True)
+    print(f"[Inference] ✅ Validator API_BASE_URL: {VALIDATOR_API_BASE_URL}", flush=True)
+    print(f"[Inference] ✅ MODEL_NAME: {MODEL_NAME}", flush=True)
+    DEMO_MODE = False
 else:
-    print("[Inference] ERROR: No API key found. Set OPENAI_API_KEY or HF_TOKEN in .env")
-    sys.exit(1)
+    # Fallback to local config for development/testing
+    from config import USE_OPENAI, USE_HF, OPENAI_API_KEY, HF_TOKEN, API_BASE_URL, MODEL_NAME
+    
+    DEMO_MODE = OPENAI_API_KEY == "demo-mode"
+    
+    if DEMO_MODE:
+        client = None  # Mock client
+        print(f"[Inference] Using DEMO MODE with model: {MODEL_NAME}")
+        print("[Inference] ⚠️  This will simulate realistic agent responses for demonstration")
+    elif USE_OPENAI:
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY, base_url=API_BASE_URL)
+        print(f"[Inference] Using OpenAI client with model: {MODEL_NAME}")
+    elif USE_HF:
+        from huggingface_hub import InferenceClient
+        client = InferenceClient(token=HF_TOKEN)
+        print(f"[Inference] Using Hugging Face client with model: {MODEL_NAME}")
+    else:
+        print("[Inference] ERROR: No API key found. Set OPENAI_API_KEY or HF_TOKEN in .env")
+        sys.exit(1)
+
+# Environment URL (always from config or args, not validator)
+from config import ENV_BASE_URL
 
 MAX_STEPS: int = 10
 TEMPERATURE: float = 0.0  # deterministic for reproducibility
@@ -324,7 +347,8 @@ def run_task(
                             response_text = '{"action_type": "route", "department": "billing, support"}'
                         else:
                             response_text = '{"action_type": "classify", "classification": "inquiry"}'
-                elif USE_OPENAI:
+                elif VALIDATOR_API_KEY and VALIDATOR_API_BASE_URL:
+                    # Use validator's LiteLLM proxy (OpenAI-compatible)
                     completion = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=messages,
@@ -333,18 +357,9 @@ def run_task(
                         stream=False,
                     )
                     response_text = completion.choices[0].message.content or ""
-                elif USE_HF:
-                    # Convert messages to a simple prompt for HF text generation
-                    prompt_parts = []
-                    for msg in messages:
-                        if msg["role"] == "system":
-                            prompt_parts.append(f"System: {msg['content']}")
-                        elif msg["role"] == "user":
-                            prompt_parts.append(f"User: {msg['content']}")
-                    
-                    full_prompt = "\n\n".join(prompt_parts) + "\n\nAssistant:"
-                    
-                    # Use a simple text generation model that works
+                    print(f"[Inference] ✅ LiteLLM Response: {response_text[:100]}...", flush=True)
+                elif hasattr(client, 'chat') and hasattr(client.chat, 'completions'):
+                    # OpenAI-compatible client (covers both OpenAI and HF cases)
                     completion = client.chat.completions.create(
                         model=MODEL_NAME,
                         messages=messages,
@@ -353,7 +368,7 @@ def run_task(
                         stream=False,
                     )
                     response_text = completion.choices[0].message.content or ""
-                    print(f"[Inference] Response text: {response_text}")
+                    print(f"[Inference] Response text: {response_text[:100]}...")
                 else:
                     response_text = '{"action_type": "done"}'  # fallback
             except Exception as exc:
@@ -454,8 +469,16 @@ def main() -> None:
     emails_per_task = args.emails
 
     # API key validation already done at module level
-
-    api_provider = "OpenAI" if USE_OPENAI else "HuggingFace" if USE_HF else "None"
+    
+    if VALIDATOR_API_KEY and VALIDATOR_API_BASE_URL:
+        api_provider = "Validator LiteLLM Proxy"
+    else:
+        try:
+            from config import USE_OPENAI, USE_HF
+            api_provider = "OpenAI" if USE_OPENAI else "HuggingFace" if USE_HF else "Demo"
+        except ImportError:
+            api_provider = "Unknown"
+    
     print(f"[Inference] API Provider: {api_provider}")
     print(f"[Inference] API_BASE_URL={API_BASE_URL}")
     print(f"[Inference] MODEL_NAME={MODEL_NAME}")
