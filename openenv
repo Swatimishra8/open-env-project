@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""OpenEnv command-line tool - minimal implementation."""
+
+import sys
+import os
+from pathlib import Path
+
+# Add current directory to path so we can import our validation script
+sys.path.insert(0, str(Path(__file__).parent))
+
+from openenv_validate import main
+
+if __name__ == "__main__":
+    main()

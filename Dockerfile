@@ -27,6 +27,11 @@ COPY app.py .
 COPY openenv.yaml .
 COPY inference.py .
 COPY config.py .
+COPY openenv_validate.py .
+COPY openenv .
+
+# Make openenv command available in PATH
+RUN chmod +x openenv && ln -s /app/openenv /usr/local/bin/openenv
 
 # Create non-root user for HF Spaces
 RUN useradd -m -u 1000 appuser && chown -R appuser /app
