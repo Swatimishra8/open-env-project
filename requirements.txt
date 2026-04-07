@@ -1,7 +1,6 @@
 # OpenEnv Email Triage — runtime only (no torch/transformers; unused in this project).
 # Works on Python 3.11, 3.12, 3.13, and 3.14+.
 
-openenv-core>=0.2.0
 fastapi>=0.115.6,<1
 uvicorn[standard]>=0.32.0,<1
 pydantic>=2.10.4,<3

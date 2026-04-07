@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY env/ ./env/
 COPY data/ ./data/
 COPY app.py .
+COPY config.py .
 COPY openenv.yaml .
 COPY inference.py .
 COPY README.md .

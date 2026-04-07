@@ -12,6 +12,7 @@ Exposes the standard OpenEnv HTTP API:
 from __future__ import annotations
 
 import os
+import sys
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional
 
@@ -30,6 +31,9 @@ from env.models import (
 from env.tasks import ALL_TASKS
 
 print("[App] Starting OpenEnv Email Triage server...")
+print("[App] Python version:", sys.version)
+print("[App] Current working directory:", os.getcwd())
+print("[App] Available tasks:", list(ALL_TASKS.keys()))
 
 # ── Global environment registry (one per task_id) ────────────────────────────
 _envs: Dict[str, EmailTriageEnv] = {}
