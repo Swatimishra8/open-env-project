@@ -12,6 +12,7 @@ Exposes the standard OpenEnv HTTP API:
 from __future__ import annotations
 
 import os
+import sys
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional
 
@@ -29,7 +30,19 @@ from env.models import (
 )
 from env.tasks import ALL_TASKS
 
-print("[App] Starting OpenEnv Email Triage server...")
+print("[App] Starting OpenEnv Email Triage server...", flush=True)
+print(f"[App] Python version: {sys.version}", flush=True)
+print(f"[App] Working directory: {os.getcwd()}", flush=True)
+
+# Test imports to catch issues early
+try:
+    from env.environment import EmailTriageEnv
+    from env.tasks import ALL_TASKS
+    print(f"[App] ✅ Successfully imported core modules", flush=True)
+    print(f"[App] ✅ Available tasks: {list(ALL_TASKS.keys())}", flush=True)
+except Exception as e:
+    print(f"[App] ❌ Import error: {e}", flush=True)
+    raise
 
 # ── Global environment registry (one per task_id) ────────────────────────────
 _envs: Dict[str, EmailTriageEnv] = {}
@@ -42,9 +55,14 @@ def get_env(task_id: str = "task_classify") -> EmailTriageEnv:
             detail=f"Unknown task_id={task_id!r}. Valid: {sorted(ALL_TASKS.keys())}",
         )
     if task_id not in _envs:
-        seed = int(os.getenv("ENV_SEED", "42"))
-        print(f"[App] Creating new env for task_id={task_id}")
-        _envs[task_id] = EmailTriageEnv(task_id=task_id, seed=seed)
+        try:
+            seed = int(os.getenv("ENV_SEED", "42"))
+            print(f"[App] Creating new env for task_id={task_id}", flush=True)
+            _envs[task_id] = EmailTriageEnv(task_id=task_id, seed=seed)
+            print(f"[App] ✅ Environment {task_id} created successfully", flush=True)
+        except Exception as e:
+            print(f"[App] ❌ Failed to create environment {task_id}: {e}", flush=True)
+            raise HTTPException(status_code=500, detail=f"Failed to create environment: {e}")
     return _envs[task_id]
 
 
@@ -52,13 +70,19 @@ def get_env(task_id: str = "task_classify") -> EmailTriageEnv:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("[App] Lifespan startup — pre-warming environments...")
-    for task_id in ALL_TASKS:
-        env = get_env(task_id)
-        env.reset()
-    print("[App] All environments ready.")
+    print("[App] Lifespan startup — pre-warming environments...", flush=True)
+    try:
+        for task_id in ALL_TASKS:
+            print(f"[App] Pre-warming {task_id}...", flush=True)
+            env = get_env(task_id)
+            env.reset()
+            print(f"[App] ✅ {task_id} ready", flush=True)
+        print("[App] ✅ All environments ready.", flush=True)
+    except Exception as e:
+        print(f"[App] ❌ Startup error: {e}", flush=True)
+        # Continue anyway - environments can be created on-demand
     yield
-    print("[App] Lifespan shutdown.")
+    print("[App] Lifespan shutdown.", flush=True)
 
 
 # ── App ───────────────────────────────────────────────────────────────────────
@@ -191,5 +215,9 @@ if __name__ == "__main__":
 
     port = int(os.getenv("PORT", "7860"))
     host = os.getenv("HOST", "0.0.0.0")
-    print(f"[App] Starting uvicorn on {host}:{port}")
-    uvicorn.run("app:app", host=host, port=port, reload=False)
+    print(f"[App] Starting uvicorn on {host}:{port}", flush=True)
+    try:
+        uvicorn.run("app:app", host=host, port=port, reload=False, log_level="info")
+    except Exception as e:
+        print(f"[App] ❌ Failed to start server: {e}", flush=True)
+        raise
