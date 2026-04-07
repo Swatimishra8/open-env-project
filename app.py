@@ -36,28 +36,27 @@ _envs: Dict[str, EmailTriageEnv] = {}
 
 
 def get_env(task_id: str = "task_classify") -> EmailTriageEnv:
-    """Lazy loading: create environment only when first requested."""
     if task_id not in ALL_TASKS:
         raise HTTPException(
             status_code=400,
             detail=f"Unknown task_id={task_id!r}. Valid: {sorted(ALL_TASKS.keys())}",
         )
-    
     if task_id not in _envs:
-        print(f"[App] Creating env for {task_id} (lazy loading)")
         seed = int(os.getenv("ENV_SEED", "42"))
+        print(f"[App] Creating new env for task_id={task_id}")
         _envs[task_id] = EmailTriageEnv(task_id=task_id, seed=seed)
-        print(f"[App] Environment {task_id} ready")
-    
     return _envs[task_id]
 
 
-# ── Simple lifespan (no pre-warming) ──────────────────────────────────────────
+# ── Lifespan (pre-warm all envs at startup) ───────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("[App] Lifespan startup — using lazy loading (no pre-warming)")
-    print("[App] Environments will be created on first use")
+    print("[App] Lifespan startup — pre-warming environments...")
+    for task_id in ALL_TASKS:
+        env = get_env(task_id)
+        env.reset()
+    print("[App] All environments ready.")
     yield
     print("[App] Lifespan shutdown.")
 
@@ -183,27 +182,6 @@ async def get_state(task_id: str = Query(default="task_classify")) -> StateResul
     print(f"[App] GET /state — task_id={task_id}")
     env = get_env(task_id)
     return env.state()
-
-
-@app.get("/run-task/{task_id}")
-async def run_task_test(task_id: str) -> Dict[str, Any]:
-    """Test endpoint to verify lazy loading works."""
-    print(f"[App] GET /run-task/{task_id} — testing lazy loading")
-    try:
-        env = get_env(task_id)
-        return {
-            "status": "env ready",
-            "task_id": task_id,
-            "env_created": True,
-            "message": f"Environment for {task_id} is ready"
-        }
-    except Exception as exc:
-        return {
-            "status": "error",
-            "task_id": task_id,
-            "env_created": False,
-            "error": str(exc)
-        }
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
