@@ -28,8 +28,8 @@ wheels/
 .venv/
 venv/
 ENV/
-env/
 .env/
+# Note: env/ is our Python package, not a virtual environment, so don't exclude it
 
 # IDE and editor files
 .vscode/
