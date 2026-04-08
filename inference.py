@@ -3,10 +3,10 @@ Baseline inference script for the OpenEnv Email Triage environment.
 
 Runs an LLM agent against all three tasks using the OpenAI client.
 Reads credentials from environment variables:
-    API_BASE_URL  — LLM API endpoint
+    API_BASE_URL  — LLM API endpoint (provided by validator)
+    API_KEY       — API key (provided by validator, fallback to OPENAI_API_KEY)
     MODEL_NAME    — Model identifier
-    HF_TOKEN      — Hugging Face / API key (used as openai api key if OPENAI_API_KEY not set)
-    OPENAI_API_KEY — OpenAI API key (takes precedence over HF_TOKEN)
+    HF_TOKEN      — Hugging Face token (fallback if no API_KEY)
     ENV_BASE_URL  — Base URL of the running OpenEnv server (default: http://localhost:7860)
 
 Usage:
@@ -24,11 +24,11 @@ import time
 from typing import Any, Dict, List, Optional
 
 import httpx
-from config import USE_OPENAI, USE_HF, OPENAI_API_KEY, HF_TOKEN, API_BASE_URL, MODEL_NAME, ENV_BASE_URL
+from config import USE_OPENAI, USE_HF, API_KEY, HF_TOKEN, API_BASE_URL, MODEL_NAME, ENV_BASE_URL
 from env.models import EmailAction
 
 # Initialize the appropriate client based on config
-DEMO_MODE = OPENAI_API_KEY == "demo-mode"
+DEMO_MODE = API_KEY == "demo-mode"
 
 if DEMO_MODE:
     client = None  # Mock client
@@ -36,14 +36,17 @@ if DEMO_MODE:
     print("[Inference] ⚠️  This will simulate realistic agent responses for demonstration")
 elif USE_OPENAI:
     from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY, base_url=API_BASE_URL)
+    # Use validator's API_KEY and API_BASE_URL if provided
+    client = OpenAI(api_key=API_KEY, base_url=API_BASE_URL)
     print(f"[Inference] Using OpenAI client with model: {MODEL_NAME}")
+    print(f"[Inference] API_BASE_URL: {API_BASE_URL}")
+    print(f"[Inference] Using API_KEY: {'***' + API_KEY[-4:] if len(API_KEY) > 4 else 'provided'}")
 elif USE_HF:
     from huggingface_hub import InferenceClient
     client = InferenceClient(token=HF_TOKEN)
     print(f"[Inference] Using Hugging Face client with model: {MODEL_NAME}")
 else:
-    print("[Inference] ERROR: No API key found. Set OPENAI_API_KEY or HF_TOKEN in .env")
+    print("[Inference] ERROR: No API key found. Set API_KEY or HF_TOKEN in .env")
     sys.exit(1)
 
 MAX_STEPS: int = 10

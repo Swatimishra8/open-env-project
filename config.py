@@ -6,10 +6,12 @@ load_dotenv()
 API_BASE_URL: str = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME: str = os.getenv("MODEL_NAME", "gpt-4o-mini")
 
+# Validator provides API_KEY, fallback to OPENAI_API_KEY for local testing
+API_KEY: str = os.getenv("API_KEY", os.getenv("OPENAI_API_KEY", ""))
 HF_TOKEN: str = os.getenv("HF_TOKEN", "")
-OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
-USE_OPENAI = bool(OPENAI_API_KEY)
+# Use validator's API_KEY if provided, otherwise check our keys
+USE_OPENAI = bool(API_KEY)
 USE_HF = not USE_OPENAI and bool(HF_TOKEN)
 
 if USE_HF and MODEL_NAME == "gpt-4o-mini":
